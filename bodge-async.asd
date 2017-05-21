@@ -12,7 +12,10 @@
   :author "Pavel Korolev"
   :mailto "dev@borodust.org"
   :license "MIT"
-  :depends-on (alexandria cffi)
+  :depends-on (alexandria cffi cl-autowrap)
   :serial t
-  :components ((:file "packages")
-               (:file "libuv")))
+  :components ((:module spec)
+               (:static-file "bodge_async.h")
+               (:file "packages")
+               (:file "libuv")
+               (:file "autowrap")))
