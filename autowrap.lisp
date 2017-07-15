@@ -20,7 +20,7 @@
                        "^__jmp_buf$"
 
                        "addrinfo"
-                       "sockaddr(-in.?|-storage)?"
+                       "sockaddr(_in.?|_storage)?"
                        "in_port_t$"
                        "in6?_addr"
                        "sa_.*_t$"
@@ -39,11 +39,12 @@
                        "speed_t$"
                        "tcflag_t$"
 
-                       "^uv_(?!_).*$"
+                       "^uv_(?!_|buf_init).*$"
                        "^uv__async$"
                        "^uv__work$"
                        "^uv__io"
                        "^uv__async_cb$")
+ :exclude-definitions ("^uv_buf_init$")
  :no-accessors t
  :symbol-exceptions (("getaddrinfo" . #.(symbol-name 'platform-getaddrinfo))
                      ("freeaddrinfo" . #.(symbol-name 'platform-freeaddrinfo))
