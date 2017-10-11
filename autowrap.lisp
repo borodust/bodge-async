@@ -10,4 +10,4 @@
                       ("gid_t" platform-gid-t)
                       ("uid_t" platform-uid-t)
                       ("sem_t" platform-sem-t))
-  :symbol-regex (("(uv|UV)_\\w*" 3)))
+  :symbol-prefix ("uv_" "UV_"))
