@@ -4,7 +4,8 @@
 (bodge-autowrap:c-include "bodge_async.h" :bodge-async
   :package :%uv
   :include-sources ("uv\\.h")
-  :include-definitions ("^uv_(?!_|buf_init).*$")
+  :include-definitions ("^uv_(?!_|buf_init).*$"
+                        "^ssize_t$")
   :symbol-exceptions (("getaddrinfo" platform-getaddrinfo)
                       ("freeaddrinfo" platform-freeaddrinfo)
                       ("gid_t" platform-gid-t)
