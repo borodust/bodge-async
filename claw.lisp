@@ -1,7 +1,4 @@
-(cl:in-package :uv)
-
-
-(bodge-autowrap:c-include "bodge_async.h" :bodge-async
+(claw:c-include "bodge_async.h" :bodge-async
   :package :%uv
   :include-sources ("uv\\.h")
   :include-definitions ("^uv_(?!_|buf_init).*$"

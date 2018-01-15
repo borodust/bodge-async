@@ -1,10 +1,7 @@
-(in-package :bodge-async.def)
-
-
-(defpackage :%uv
+(cl:defpackage :%uv
   (:use))
 
 
-(defpackage :uv
+(cl:defpackage :uv
   (:use :cl :cffi)
   (:export))
