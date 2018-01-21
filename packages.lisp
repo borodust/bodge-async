@@ -4,4 +4,4 @@
 
 (cl:defpackage :uv
   (:use :cl :cffi)
-  (:export))
+  (:export libuv))

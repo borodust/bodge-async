@@ -2,8 +2,6 @@
 
 
 (define-foreign-library libuv
-  (:darwin (:or "libuv.1.dylib" "libuv.dylib"))
-  (:unix (:or "libuv.so.1" "libuv.so"))
-  (:windows "libuv.dll"))
-
-(use-foreign-library libuv)
+  (:darwin "libuv.dylib.bodged")
+  (:unix "libuv.so.bodged")
+  (:windows "libuv.dll.bodged"))

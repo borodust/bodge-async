@@ -1,0 +1,50 @@
+image:
+  - Visual Studio 2017
+
+environment:
+  global:
+    NAME: uv
+  matrix:
+  - platform: x64
+    configuration: Release
+    ARCH: x86_64
+  - platform: x86
+    ARCH: i686
+    configuration: Release
+
+skip_non_tags: true
+
+branches:
+  only:
+    - master
+    - "/^v\\d+(\\.\\d+)+$/"
+
+init:
+  - git config --global core.autocrlf true
+
+install:
+  - git submodule update --init --recursive
+
+build_script:
+  - set TARGET_ARTIFACT=lib%NAME%.dll.bodged-%ARCH%-windows-%APPVEYOR_REPO_TAG_NAME%
+  - cd lib\uv
+  - vcbuild vs2017 %platform% release shared
+  - mv Release\libuv.dll %APPVEYOR_BUILD_FOLDER%\%TARGET_ARTIFACT%
+
+artifacts:
+  - path: $(TARGET_ARTIFACT)
+    name: target_artifact
+
+deploy:
+  provider: GitHub
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
+  auth_token:
+    secure: Z5XWjDOBlCrmfz3SQAjnLKtdgI5B2b/owJhRPNWYGrI+qwVNbBc4cZiroBZReWP7
+  artifact: target_artifact
+  force_update: true
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
