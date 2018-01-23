@@ -2,6 +2,7 @@
   :in-package :%uv
   :sysincludes (:uv-includes)
   :include-definitions ("^uv_\\w*")
+  :windows-environment "msvc"
   :rename-symbols (claw:in-pipeline
                    (claw:by-changing "getaddrinfo" 'platform-getaddrinfo)
                    (claw:by-changing "freeaddrinfo" 'platform-freeaddrinfo)
