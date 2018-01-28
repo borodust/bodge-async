@@ -1,7 +1,8 @@
 (claw:c-include "bodge_async.h" :bodge-async
   :in-package :%uv
   :sysincludes (:uv-includes)
-  :include-definitions ("^uv_\\w*")
+  :include-definitions ("^uv_\\w*"
+                        "^ssize_t$")
   :windows-environment "msvc"
   :rename-symbols (claw:in-pipeline
                    (claw:by-changing "getaddrinfo" 'platform-getaddrinfo)

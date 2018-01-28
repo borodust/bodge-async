@@ -13,17 +13,17 @@ STATIC_LIBS = -luv
 ifeq ($(OS),Windows_NT)
 	BIN := $(BIN).dll.bodged
 	CCFLAGS := $(CCFLAGS) -Wl,-soname,$(BIN)
-	LFLAGS := -Wl,-Bstatic $(STATIC_LIBS) -Wl,-Bdynamic $(LIBS)
+	LFLAGS := -Wl,--whole-archive -Wl,-Bstatic $(STATIC_LIBS) -Wl,--no-whole-archive -Wl,-Bdynamic $(LIBS)
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		BIN := $(BIN).dylib.bodged
 		CCFLAGS := $(CCFLAGS) -Wl,-install_name,$(BIN)
-		LFLAGS := $(LIBS) $(STATIC_LIBS)
+		LFLAGS := $(LIBS) -all_load $(STATIC_LIBS)
 	else
 		BIN := $(BIN).so.bodged
 		CCFLAGS := $(CCFLAGS) -Wl,-soname,$(BIN)
-		LFLAGS := -Wl,-Bstatic $(STATIC_LIBS) -Wl,-Bdynamic $(LIBS)
+		LFLAGS := -Wl,--whole-archive -Wl,-Bstatic $(STATIC_LIBS) -Wl,--no-whole-archive -Wl,-Bdynamic $(LIBS)
 	endif
 endif
 
