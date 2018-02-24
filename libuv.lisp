@@ -1,4 +1,4 @@
-(in-package :uv)
+(cl:in-package :uv)
 
 
 (define-foreign-library libuv
