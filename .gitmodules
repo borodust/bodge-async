@@ -2,5 +2,5 @@
 	path = lib/lib/uv
 	url = https://github.com/libuv/libuv.git
 [submodule "lib/uv"]
-	path = lib/uv
+	path = src/lib/uv
 	url = https://github.com/libuv/libuv.git

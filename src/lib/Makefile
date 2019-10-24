@@ -4,7 +4,7 @@ ENV_CFLAGS := $(CFLAGS)
 CCFLAGS := $(ENV_CFLAGS) -std=gnu99 -pedantic -O2 -fPIC -Iuv/include/ -I../ -Luv/.libs/
 
 
-SRC = main.c
+SRC = adapter.c
 OBJ = $(SRC:.c=.o)
 LIBS = -lpthread
 STATIC_LIBS = -luv
@@ -36,6 +36,7 @@ $(BIN):
 		./configure --disable-shared --with-pic && \
 		make
 	$(CC) -shared $(SRC) $(CCFLAGS) -o $(BIN) $(LFLAGS)
+	strip -S $(BIN)
 
 clean:
 	rm -f $(BIN) $(OBJS)

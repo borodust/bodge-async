@@ -9,29 +9,31 @@ addons:
 env:
   global:
     - NAME: uv
+    - ASDF_SYSTEM: bodge-uv
+    - PATH: ~/.bodge/bin/:$PATH
     - BUILDTYPE: Release
-    - secure: her0fk9laY9q29uA+TdJnCWfsxG4oQPhlcANSeKrweqrp2pLRKz6hnLJWiB2awBUGu9OAyjxUJrrvuMb9JjYr9bcKKw0CEkWTp245nl3bjW/b9dsCwXov33qRDjdL0NF6tgIwakxDqhypOWVEpnRpfdIExU5AA5hZ/lWGWtaQCS3qvH7kBb+onqIbwhfxBHcTJ49BGObmCSj53zj+mzVXiPabT6vZ/FcTOhIq8xOnahbjPM9DPyYdATImKuUgvrZIdFgDfi2JoCcdHiELZfDXGxBQB8th0hocnf0faqbhc/gkBfpzr9aCdQ/8LeTVSPBSR4xzz7LWUx/CGUu+EtcQglR8yFZjzpTfM9TbPzkXOgsW8uFRvDf1USBYUarKgoKi8aFcOp1YTL+1ms5XoHgaVQJ5kx+/ojr5ImNGsQNmFLCV+o+CS2dABhCFlXJ2rY8vB+VE/5YJF/Nxo6HtmVUiifLdiflGhlPtWGgb6gjcQ6dPq7nn3jPTe/TkKt+VOktFRmKfC1o+Rud+g1aiOxL8Kb0PHQx329oUuy0ECxuSbOpvi4NtAdFXhGXiE7QScyP/ICL0mEB87xXAKMBKCmQHq15mXXy5kIZFQFmceAkGYVLh3Fo9ImjQkiely9K1mW2peZcK9pRHsgjZZQHJP8FLuLkq+Bk2CPvSuBFDhYtNYU=
+    - secure: "cibWiQ0OfEpgze9o6CktZSShCtZDNxMebYsFBwW773SKmR/yhIizVRXCRobKlt4hFlKJa+IPxou3pCNDESd0troU4ftT77FdRJ2bHKqEaQJXgjr9rytEddQBBbHxnqxpdhqcDpOLk0j5L3Yytz7k2Y7deEFKRadbjncA9DwkfqzrLPDG/OIQuwR97ASc+Pw1afBJZkllyikMBdcgxSPSPVCpTw6DB5/eBVGAejvxBcgQGKkdQrcbnmjzzNR+fsUTTaGgrSuhmixFDPnTR0UlQawjAvqttmvFD1FNrvCpLG6XXMYuN4AnqtokkcrW68YXZDaqbstFagiGdiNcNZL0cNOCeH/uvzoUVozlsouJU/8DqqCAU0Ahxv3z6pdKKAC0YPJqBp5XxlMYLWyjWcbK+bvPxbvB42eYHXUGcYygspgOkXlp2Fcc3AZKTBJyk3zjGVDGIs/tZK8VqeqInM4gUHB09oLlp2LQyVSLH89IW19IIoAiPUZbbL5Sk5DDJds6RPQk81NcKfRJxAd123eTItoe6VcMrP8fcc95vIQyokEkNnoOMeqM+Moqsxvlg2UdgnQ3ziwf/nuG+uXYBkCeBjRTSvDRMGVx5xJHQgg8KA3VaW5pb6RZ9+eZPUa4DY9VCQsMhaC8II4vo6K4XCpv7G2DHWsKzXTp2D0dJ+dyRLQ="
 
 matrix:
   include:
   - os: linux
     env:
-      - ARCH=i686
+      - TARGET_ARCH=i686
       - CFLAGS=-m32
       - EXTENSION=so
   - os: linux
     env:
-      - ARCH=x86_64
+      - TARGET_ARCH=x86_64
       - CFLAGS=-m64
       - EXTENSION=so
   - os: osx
     env:
-      - ARCH=i686
+      - TARGET_ARCH=i686
       - CFLAGS=-m32
       - EXTENSION=dylib
   - os: osx
     env:
-      - ARCH=x86_64
+      - TARGET_ARCH=x86_64
       - CFLAGS=-m64
       - EXTENSION=dylib
 
@@ -39,18 +41,23 @@ branches:
   only:
   - "/^v\\d+(\\.\\d+)+$/"
 
+install:
+  - curl -L http://bodge.borodust.org/files/install.sh | sh
 
 script:
-  - cd lib/ && make clean build
+  - export TARGET_FILE=$TRAVIS_BUILD_DIR/lib$NAME.$EXTENSION.bodged-$TARGET_ARCH-$TRAVIS_OS_NAME-$TRAVIS_BRANCH
+  - export TARGET_SPEC=$TARGET_FILE-spec.zip
+  - cd src/lib/ && make clean build
+  - lisp regen-local-spec-and-zip --arch $TARGET_ARCH "$TRAVIS_BUILD_DIR" $ASDF_SYSTEM "$TARGET_SPEC"
 
 before_deploy:
-  - export TARGET_FILE=$TRAVIS_BUILD_DIR/lib$NAME.$EXTENSION.bodged-$ARCH-$TRAVIS_OS_NAME-$TRAVIS_BRANCH
-  - mv $TRAVIS_BUILD_DIR/lib/lib$NAME.$EXTENSION.bodged $TARGET_FILE
+
+  - mv $TRAVIS_BUILD_DIR/src/lib/lib$NAME.$EXTENSION.bodged $TARGET_FILE
 
 deploy:
   provider: releases
   api-key: $GITHUB_TOKEN
-  file: $TARGET_FILE
+  file: [$TARGET_FILE, $TARGET_SPEC]
   skip_cleanup: true
   overwrite: true
   on:
