@@ -11,8 +11,7 @@
 (claw:defwrapper (uv::bodge-uv
                   (:headers "uv.h")
                   (:includes :uv-includes)
-                  #+windows
-                  (:environment "msvc")
+                  (:windows-environment "msvc")
                   (:include-definitions "^uv_\\w*"))
   :in-package :%uv
   :trim-enum-prefix t
@@ -24,6 +23,5 @@
   :symbolicate-names (:in-pipeline
                       (:by-removing-prefixes "uv_" "UV_")
                       (:if-none-matched
-                       (:only-for
-                        :type
-                        (:switch-package :%%uv)))))
+                       (:only-for :type
+                                  (:switch-package :%%uv)))))

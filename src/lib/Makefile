@@ -12,6 +12,7 @@ STATIC_LIBS = -luv
 
 ifeq ($(OS),Windows_NT)
 	BIN := $(BIN).dll.bodged
+	LIBS += -lws2_32 -luserenv -lversion -lpsapi -liphlpapi
 	CCFLAGS := $(CCFLAGS) -Wl,-soname,$(BIN)
 	LFLAGS := -Wl,--whole-archive -Wl,-Bstatic $(STATIC_LIBS) -Wl,--no-whole-archive -Wl,-Bdynamic $(LIBS)
 else

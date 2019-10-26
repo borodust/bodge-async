@@ -8,12 +8,15 @@ environment:
   matrix:
   - platform: x64
     configuration: Release
-    SPEC_TARGET_ARCH: x86_64
-    MSYS_PATH: C:\msys64\mingw64\bin\;C:\msys64\usr\bin\
+    TARGET_ARCH: x86_64
+    PATH: C:\msys64\mingw64\bin\;C:\msys64\usr\bin\;$(PATH)
+    PACKAGES: mingw-w64-x86_64-toolchain mingw-w64-x86_64-libtool
   - platform: x86
-    SPEC_TARGET_ARCH: i686
+    TARGET_ARCH: i686
     configuration: Release
-    MSYS_PATH: C:\msys64\mingw32\bin\;C:\msys64\usr\bin\
+    PATH: C:\msys64\mingw32\bin\;C:\msys64\usr\bin\;$(PATH)
+    PACKAGES: mingw-w64-i686-toolchain mingw-w64-i686-libtool
+
 
 skip_non_tags: true
 
@@ -27,18 +30,23 @@ init:
 
 install:
   - git submodule update --init --recursive
+  - pacman --needed --noconfirm -S zip unzip base-devel %PACKAGES%
+  - curl -L http://bodge.borodust.org/files/install.sh | sh
 
 build_script:
-  - set TARGET_ARTIFACT=lib%NAME%.dll.bodged-%SPEC_TARGET_ARCH%-windows-%APPVEYOR_REPO_TAG_NAME%
+  - set APPVEYOR_BUILD_DIR=$(cygpath -m '%APPVEYOR_BUILD_FOLDER%')
+  - set TARGET_ARTIFACT=lib%NAME%.dll.bodged-%TARGET_ARCH%-windows-%APPVEYOR_REPO_TAG_NAME%
   - set TARGET_SPEC=%TARGET_ARTIFACT%-spec.zip
-  - cd src\lib\uv
-  - vcbuild vs2017 %platform% release shared
-  - mv Release\libuv.dll %APPVEYOR_BUILD_FOLDER%\%TARGET_ARTIFACT%
-  - set PATH=%MSYS_PATH%;%PATH%
-  - set APPVEYOR_BUILD_DIR=$(cygpath -u '%APPVEYOR_BUILD_FOLDER%')
-  - curl -L http://bodge.borodust.org/files/install.sh | sh
-  - pacman --needed --noconfirm -S zip unzip base-devel
-  - sh -c "~/.bodge/bin/lisp regen-local-spec-and-zip --arch %SPEC_TARGET_ARCH% \"$(cygpath -u '%APPVEYOR_BUILD_FOLDER%')\" %ASDF_SYSTEM% \"$(cygpath -u '%APPVEYOR_BUILD_FOLDER%\%TARGET_SPEC%')\""
+  - >
+    sh -c "
+    MSYSTEM=MINGW64 . /etc/profile
+    && export PATH=$HOME/.bodge/bin/:$PATH
+    && cd %APPVEYOR_BUILD_DIR%/src/lib/
+    && make clean build
+    && ~/.bodge/bin/lisp regen-local-spec-and-zip
+    --arch %TARGET_ARCH% \"%APPVEYOR_BUILD_DIR%\" %ASDF_SYSTEM%
+    \"%APPVEYOR_BUILD_DIR%/%TARGET_SPEC%\""
+  - mv %APPVEYOR_BUILD_FOLDER%\src\lib\lib%NAME%.dll.bodged %APPVEYOR_BUILD_FOLDER%\%TARGET_ARTIFACT%
 
 artifacts:
   - path: $(TARGET_ARTIFACT)
